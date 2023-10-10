@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Gesture and Pose Detection</title>
+    <!-- Add your head elements (stylesheets, scripts, etc.) here -->
+    <style>
+        /* Add your CSS styles here */
+    </style>
+</head>
+<body>
+    <h1>Gesture Recognition</h1>
+    <div>
+        <video id="video" width="640" height="480" autoplay></video>
+        <button id="startButton" onclick="startCapture()">Start Capture</button>
+        <button id="stopButton" onclick="stopCapture()" disabled>Stop Capture</button>
+    </div>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <div id="result"></div>
+
+    <script>
+        let captureInterval;
+        const video = document.getElementById('video');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+
+        async function startCapture() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+
+                // Enable the stop button and disable the start button
+                startButton.disabled = true;
+                stopButton.disabled = false;
+
+                const socket = new WebSocket('ws://localhost:5000');  // Modify with your server address
+
+                const model = await tf.loadLayersModel('path/to/your/model.json');
+
+                video.addEventListener('play', () => {
+                    const canvas = document.getElementById('canvas');
+                    const context = canvas.getContext('2d');
+                    captureInterval = setInterval(async () => {
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const image = tf.browser.fromPixels(canvas).expandDims(0);
+                        const predictions = await model.predict(image).data();
+
+                        // Modify this part based on your prediction logic
+                        const predictedClass = predictions.indexOf(Math.max(...predictions));
+                        const classNames = ['Class1', 'Class2', 'Class3'];  // Modify with your class names
+                        const predictedGesture = classNames[predictedClass];
+
+                        const resultDiv = document.getElementById('result');
+                        resultDiv.innerText = 'Predicted Gesture: ' + predictedGesture;
+
+                        // Send the frame data to the server
+                        const frameData = canvas.toDataURL('image/jpeg');
+                        socket.send(JSON.stringify({ frameData }));
+                    }, 1000);  // Adjust the interval as needed
+                });
+            } catch (err) {
+                console.error('Error accessing the webcam:', err);
+            }
+        }
+
+        function stopCapture() {
+            // Disable the stop button and enable the start button
+            startButton.disabled = false;
+            stopButton.disabled = true;
+
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Clear the capture interval
+            clearInterval(captureInterval);
+
+            // Pause the video and close the video stream
+            const stream = video.srcObject;
+            const tracks = stream.getTracks();
+            tracks.forEach(track => track.stop());
+            video.srcObject = null;
+        }
+    </script>
+</body>
+</html>
