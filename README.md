@@ -8,4 +8,7 @@ The project uses Mediapipe Holistic, a deep learning model, to accurately detect
 
 ![alt text](https://github.com/ThaminduSulakshana/Classification_sentiment_analysis/blob/2f7b074e3b75ea286f1fbaabb2718327b79cb665/capture.png?raw=true)
 
+![Output Image](https://github.com/ThaminduSulakshana/Real-Time-Gesture-Control-and-Pose-Detection/raw/586a7d0e657d970e538aa15c4c791827e9ea1010/output.png)
+
+
 
