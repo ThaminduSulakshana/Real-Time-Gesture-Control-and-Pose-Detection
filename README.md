@@ -6,5 +6,6 @@ The project uses Mediapipe Holistic, a deep learning model, to accurately detect
 
 [Watch the Video](https://drive.google.com/file/d/1MT-SYjl9LY9weUPpCOVdeex5iALPuV5F/view?usp=sharing)
 
+![alt text](https://github.com/ThaminduSulakshana/Classification_sentiment_analysis/blob/2f7b074e3b75ea286f1fbaabb2718327b79cb665/capture.png?raw=true)
 
 
